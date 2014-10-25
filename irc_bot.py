@@ -177,6 +177,3 @@ class IRCBot():
     def start(self):
         s = self._connect()
         self.process_data(s)
-
-bot = IRCBot()
-bot.start()
