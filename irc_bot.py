@@ -137,7 +137,7 @@ class IRCBot():
                                     response = []
                                     channel = str(
                                         message_content.split(' ')[1:][0]
-                                        ).rstrip()
+                                    ).rstrip()
                                     jcmd = "JOIN %s\n" % (channel)
                                     mcmd = "PRIVMSG %s :Joining %s\n" % (
                                         message_target,
