@@ -4,7 +4,7 @@ from random import randint
 
 class IRCBot():
     def __init__(self, server=None, port=None, bot_nick=None,
-                 bot_ident=None, mychans=None):
+                     bot_ident=None, mychans=None):
         if server is None:
             self.server = "orwell.freenode.net"
         else:
@@ -110,11 +110,8 @@ class IRCBot():
                          code 376 = end of MOTD
                         """
                         if message_type == '376':
-                            join_cmds = []
                             for chan in self.mychans:
-                                cmd = "JOIN %s\n" % chan
-                                join_cmds.append(cmd)
-                            return join_cmds
+                                return self.join_chan(chan)
 
                         """ handle channel only privmsg commands """
                         if message_target in self.mychans:
@@ -126,7 +123,7 @@ class IRCBot():
                                         message_source_nick,
                                         self.get_uptime()
                                     )
-                                return msg
+                                    return msg
 
                         """ handle channel and direct privmsg commands """
                         if message_target in self.bot_nick or self.mychans:
@@ -134,19 +131,13 @@ class IRCBot():
                             if self.is_command(message_content, "!join"):
                                 fmsg = message_content.split(' ')
                                 if len(fmsg) > 1:
-                                    response = []
                                     channel = str(
                                         message_content.split(' ')[1:][0]
-                                    ).rstrip()
-                                    jcmd = "JOIN %s\n" % (channel)
-                                    mcmd = "PRIVMSG %s :Joining %s\n" % (
-                                        message_target,
-                                        channel
+                                        ).rstrip()
+                                    return self.join_chan(
+                                        channel,
+                                        message_target
                                     )
-                                    response.append(jcmd)
-                                    response.append(mcmd)
-                                    print response
-                                    return response
 
                             """ !part command """
                             if self.is_command(message_content, "!part"):
@@ -167,6 +158,15 @@ class IRCBot():
             return True
         return False
 
+    def join_chan(self, chan, target=None):
+            cmds = []
+            jcmd = "JOIN %s\n" % (chan)
+            cmds.append(jcmd)
+            if target:
+                mcmd = "PRIVMSG %s :Joining %s\n" % (target, chan)
+                cmds.append(mcmd)
+            return cmds
+
     def get_uptime(self):
         from subprocess import Popen, PIPE, STDOUT
         cmd = 'uptime'
@@ -177,3 +177,6 @@ class IRCBot():
     def start(self):
         s = self._connect()
         self.process_data(s)
+
+bot = IRCBot()
+bot.start()
