@@ -1,24 +1,37 @@
+import ConfigParser
 import socket
 import ssl
 from random import randint
 
 class IRCBot():
     def __init__(self, server=None, port=None, bot_nick=None,
-                     bot_ident=None, mychans=None):
+                     bot_ident=None, mychans=None, configfile=None):
+        if configfile == None:
+            self.configfile = ["bot_config.cfg"]
+        else:
+            self.configfile = configfile
+
+        self.config = ConfigParser.RawConfigParser()
+        self.config.read(self.configfile)
+
         if server is None:
-            self.server = "orwell.freenode.net"
+            self.server = \
+                    self.config.get('IRCBot', 'server')
         else:
             self.server = server
         if port is None:
-            self.port = 6697
+            self.port = \
+                    int(self.config.get('IRCBot', 'port'))
         else:
             self.port = port
         if bot_nick is None:
-            self.bot_nick = "bottybot"
+            self.bot_nick = \
+                    self.config.get('IRCBot', 'nick')
         else:
             self.bot_nick = bot_nick
         if bot_ident is None:
-            self.bot_ident = "bottybot"
+            self.bot_ident = \
+                    self.config.get('IRCBot', 'ident')
         else:
             self.bot_ident = bot_ident
         if mychans is None:
