@@ -3,7 +3,7 @@ simple-irc-bot
 
 Simple irc bot
 
-Uses SSL
+requires ssl-enabled irc server
 
-Responds to !uptime, !join, !part
-
+Responds to channel commands: !uptime, !join, !part
+Responds to direct privmsg commands: !uptime
