@@ -7,7 +7,9 @@ class IRCBot():
     def __init__(self, server=None, port=None, bot_nick=None,
                      bot_ident=None, mychans=None, configfile=None):
         if configfile == None:
-            self.configfile = ["bot_config.cfg"]
+            self.configfile = [
+                "bot_config.cfg"
+            ]
         else:
             self.configfile = configfile
 
@@ -16,29 +18,47 @@ class IRCBot():
 
         if server is None:
             self.server = \
-                    self.config.get('IRCBot', 'server')
+                self.config.get(
+                    'IRCBot',
+                    'server'
+                )
         else:
             self.server = server
         if port is None:
             self.port = \
-                    int(self.config.get('IRCBot', 'port'))
+                int(
+                    self.config.get(
+                        'IRCBot',
+                        'port'
+                    )
+                )
         else:
             self.port = port
         if bot_nick is None:
             self.bot_nick = \
-                    self.config.get('IRCBot', 'nick')
+                self.config.get(
+                    'IRCBot',
+                    'nick'
+                )
         else:
             self.bot_nick = bot_nick
         if bot_ident is None:
             self.bot_ident = \
-                    self.config.get('IRCBot', 'ident')
+                self.config.get(
+                    'IRCBot',
+                    'ident'
+                )
         else:
             self.bot_ident = bot_ident
         if mychans is None:
-            self.mychans = [
-                "#bottybot",
-                "#bottybot1"
-            ]
+            chans = \
+                self.config.get(
+                    'IRCBot',
+                    'chans'
+                )
+            self.mychans = list(
+                str(chans).split(',')
+            )
         else:
             self.mychans = mychans
 
