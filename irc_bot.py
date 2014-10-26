@@ -59,6 +59,7 @@ class IRCBot():
             self.mychans = list(
                 str(chans).split(',')
             )
+            print self.mychans
         else:
             self.mychans = mychans
 
@@ -89,7 +90,8 @@ class IRCBot():
 
     def _send2server(self, result):
         if result is not None and len(result) > 0:
-            print type(result)
+            print(type(result))
+            print result
             if isinstance(result, list):
                 for each in result:
                     print("sending to server > %s" % each)
@@ -120,7 +122,7 @@ class IRCBot():
                         if ":" in ' '.join(section[2:]):
                             message_content = \
                                 ' '.join(section[2:]).split(':')[1]
-                            print message_content
+                            print(message_content)
                         else:
                             message_content = ' '.join(section[2:])
 
@@ -143,14 +145,13 @@ class IRCBot():
                          code 376 = end of MOTD
                         """
                         if message_type == '376':
-                            for chan in self.mychans:
-                                return self.join_chan(chan)
+                                return self.join_chan(self.mychans)
 
                         """ handle channel only privmsg commands """
                         if message_target in self.mychans:
                             if message_type == 'PRIVMSG':
                                 if self.is_command(message_content, "!uptime"):
-                                    print "got !uptime command!"
+                                    print("got !uptime command!")
                                     msg = "PRIVMSG %s :%s: %s\n" % (
                                         message_target,
                                         message_source_nick,
@@ -162,11 +163,11 @@ class IRCBot():
                         if message_target in self.bot_nick or self.mychans:
                             """ !join command """
                             if self.is_command(message_content, "!join"):
-                                fmsg = message_content.split(' ')
-                                if len(fmsg) > 1:
+                                msg = message_content.split(' ')
+                                if len(msg) > 1:
                                     channel = str(
-                                        message_content.split(' ')[1:][0]
-                                        ).rstrip()
+                                        msg[1:][0]
+                                    ).rstrip()
                                     return self.join_chan(
                                         channel,
                                         message_target
@@ -174,11 +175,15 @@ class IRCBot():
 
                             """ !part command """
                             if self.is_command(message_content, "!part"):
-                                fmsg = message_content.split(' ')
-                                if len(fmsg) > 1:
-                                    j = "PART %s\n" % (str(message_content.split(' ')[1:][0]).rstrip())
-                                    print j
-                                    return j
+                              msg = message_content.split(' ')
+                              if len(msg) > 1:
+                                  channel = str(
+                                      msg[1:][0]
+                                  ).rstrip()
+                                  return self.part_chan(
+                                      channel,
+                                      message_target
+                                  )
                         else:
                             print "random privmsg received, ignoring.. (%s)" % str(message_content).strip()
                     except IndexError, e:
@@ -192,11 +197,38 @@ class IRCBot():
         return False
 
     def join_chan(self, chan, target=None):
-            cmds = []
+        cmds = []
+        if isinstance(chan, list):
+            for each in chan:
+                jcmd = "JOIN %s\n" % (each)
+                cmds.append(jcmd)
+                if target:
+                    mcmd = "PRIVMSG %s :Joining %s\n" % (
+                        target, 
+                        each
+                    )
+                    cmds.append(mcmd)
+        else:
             jcmd = "JOIN %s\n" % (chan)
             cmds.append(jcmd)
             if target:
-                mcmd = "PRIVMSG %s :Joining %s\n" % (target, chan)
+                mcmd = "PRIVMSG %s :Joining %s\n" % (
+                    target,
+                    chan
+                )
+                cmds.append(mcmd)
+        print cmds
+        return cmds
+
+    def part_chan(self, chan, target=None):
+            cmds = []
+            pcmd = "PART %s\n" % (chan)
+            cmds.append(pcmd)
+            if target:
+                mcmd = "PRIVMSG %s :Parting %s\n" % (
+                    target,
+                    chan
+                )
                 cmds.append(mcmd)
             return cmds
 
